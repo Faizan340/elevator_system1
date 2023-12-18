@@ -50,6 +50,39 @@ class ElevatorRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ElevatorRequestModel
         fields = ['elevator', 'current_floor', 'destination_floor']
+    
+    def validate(self, data):
+        """
+        Validating the elevator's working status before creating a request.
+        """
+        elevator = data['elevator']
+
+        if elevator.working == False:
+            raise serializers.ValidationError("Elevator is not working. Request cannot be created.")
+
+        return data
+ 
+    def validate(self, data):
+        """
+        Validating the request data and update elevator status.
+        """
+        elevator = data['elevator']
+
+        # Updating direction based on the destination floor
+        if elevator.curr_floor < data['current_floor']:
+            elevator.direction = 1  # Moving up
+            elevator.door_open = False
+        elif elevator.curr_floor > data['current_floor']:
+            elevator.direction = -1  # Moving down
+            elevator.door_open = False
+        else:
+            elevator.direction = 0  # No movement (elevator already on the requested floor)
+
+        # Saving the changes to the elevator
+        elevator.save()
+
+        return data
+
 
     def validate_current_floor(self, value):
         """
@@ -69,6 +102,9 @@ class ElevatorRequestSerializer(serializers.ModelSerializer):
 
 
 class ElevatorRequestWithElevatorSerializer(serializers.ModelSerializer):
+    """
+    Serializer for elevator request along with elevator's info.
+    """
     elevator = ElevatorSerializer()
 
     class Meta:

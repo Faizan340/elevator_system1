@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import ElevatorSystemViewSet, ElevatorViewSet, ElevatorRequestViewSet, ElevatorWorkingStatusView, ElevatorDoorStatusView
 
-app_name = "lift"
+# app_name = "lift"
 
 elevatorsystem_router = DefaultRouter()
 elevatorsystem_router.register(r'elevatorsystems', ElevatorSystemViewSet)
